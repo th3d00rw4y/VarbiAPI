@@ -1,4 +1,4 @@
-function Get-Secret {
+﻿function Get-Secret {
 
     <#
     .SYNOPSIS
@@ -26,20 +26,20 @@ function Get-Secret {
         [string]
         $LiteralPath
     )
-    
+
     begin {
 
     }
-    
+
     process {
         try {
             $CredObject = Import-Clixml -Path $LiteralPath
         }
         catch {
-            
+            Write-Error $_.Exception.Message
         }
     }
-    
+
     end {
         return $CredObject
     }
