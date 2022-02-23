@@ -18,26 +18,89 @@ function Get-FilePath {
     [CmdletBinding()]
 
     param (
-        # Directory where to start the file prompt
-        [Parameter()]
-        [string]
-        $InitialDirectory
+
+        # Target type
+        [Parameter(Mandatory = $true)]
+        [ValidateSet(
+            'BASecret',
+            'APIKey',
+            'Settings'
+        )]
+        [string[]]
+        $Type
     )
-    
+
     begin {
-        [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+
+        $Table = [PSCustomObject]@{}
+
+        function OpenDialog {
+            param (
+                [string]
+                $Type,
+
+                [string]
+                $Title
+            )
+
+            [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
+
+            switch ($Type) {
+                OpenFileDialog      {
+                    $OpenDialog        = New-Object System.Windows.Forms.$Type
+                    $OpenDialog.Title  = $Title
+                    $OpenDialog.filter = "All files (*.*)| *.*"
+                    $OpenDialog.ShowDialog() | Out-Null
+
+                    return $OpenDialog.filename
+                }
+                FolderBrowserDialog {
+                    $OpenDialog             = New-Object System.Windows.Forms.$Type
+                    $OpenDialog.Description = $Title
+                    $Form                   = New-Object System.Windows.Forms.Form -Property @{TopMost = $true}
+                    $Result = $OpenDialog.ShowDialog($Form)
+
+                    if ($Result -eq [Windows.Forms.DialogResult]::OK) {
+                        $SettingsFilePath = "$($OpenDialog.SelectedPath)\Varbi_Settings.csv"
+                        return $SettingsFilePath
+                    }
+                }
+            }
+        }
     }
-    
+
     process {
-        $OpenFileDialog                  = New-Object System.Windows.Forms.OpenFileDialog
-        $OpenFileDialog.initialDirectory = $initialDirectory
-        $OpenFileDialog.filter           = "All files (*.*)| *.*"
-        $OpenFileDialog.ShowDialog() | Out-Null
-        
+
+        switch ($Type) {
+            BASecret {
+                $OpenParams = @{
+                    Type  = "OpenFileDialog"
+                    Title = "Select credential file with encrypted BA secret"
+                }
+
+                $Table | Add-Member -MemberType NoteProperty -Name $_ -Value $(OpenDialog @OpenParams)
+            }
+            APIKey   {
+                $OpenParams = @{
+                    Type  = "OpenFileDialog"
+                    Title = "Select credential file with encrypted API key"
+                }
+
+                $Table | Add-Member -MemberType NoteProperty -Name $_ -Value $(OpenDialog @OpenParams)
+            }
+            Settings {
+                $OpenParams = @{
+                    Type  = "FolderBrowserDialog"
+                    Title = "Select path to store the ""Varbi_Settings.csv"" file"
+                }
+
+                $Table | Add-Member -MemberType NoteProperty -Name $_ -Value $(OpenDialog @OpenParams)
+            }
+        }
     }
-    
+
     end {
-        return $OpenFileDialog.filename
+        return $Table
     }
 }
 # End function.
