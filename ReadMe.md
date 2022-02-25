@@ -40,11 +40,22 @@ Please make sure you've followed each one.
 2. `Install-Module -Name VarbiAPI`
 3. `Import-Module -Name VarbiAPI`. You will get a warning saying that there is no settings file present, but let's skip this for now.
 4. `New-Secret` See [New-Secret.md](/Resources/SecretClixml/Docs/New-Secret.md) for examples.
-5. Run `Initialize-SettingsFile`. See [/Docs](Docs/Initialize-SettingsFile.md) for examples.
+5. Run `Initialize-SettingsFile`. See [Initialize-SettingsFile.md](Docs/Initialize-SettingsFile.md) for examples.
 6. Finally import the module again `Import-Module VarbiAPI -Force`. And you should be good to go!
 
 ## Changelog
 `VarbiAPI` is currently only maintained by me. I will try to add as many features as possible.
+- ## 2022.02.22 - Version: 0.0.1.2
+    - New public cmdlets:
+        - [x] [Update-VarbiUser](Docs/Update-VarbiUser.md)
+        - [x] [Disable-VarbiUser](Docs/Disable-VarbiUser.md)
+        - [x] [Enable-VarbiUser](Docs/Enable-VarbiUser.md)
+    - New private functions:
+        - `ConvertFrom-ADObject`
+            - Converts an AD user object into json prepared object with all the right properties.
+    - New nested module:
+        - [x] [SecretClixml](/Resources/SecretClixml/)
+            - Used to encrypt and store the API key aswell as retrieving it.
 - ## 2022.02.17 - Version: 0.0.1.1
     - New public cmdlets:
         - [x] [Initialize-SettingsFile](Docs/Initialize-SettingsFile.md)
