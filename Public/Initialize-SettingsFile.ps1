@@ -6,9 +6,8 @@
 
     .DESCRIPTION
     This CMDlet will build a CSV file with information on how to connect to your organizations instance of Varbi.
-    The ADProperty parameters are there for you to provide your organizations property names. e.g: In organization A, cellWorkphone number can be found in extensionAttribute6  and organization is found under physicalDeliveryOfficeName
-    You will also be prompted to select path to 2 different credential files. If you haven't generated these credential files, please refer to the module documentation.
-    Lastly you will be prompted to select a folder where the settings file will be stored.
+    You will be prompted to select a folder where the settings file will be stored.
+    The ADProperty parameters are there for you to provide your organizations property names. e.g: In organization A, Workphone number can be found in extensionAttribute6  and organization is found under physicalDeliveryOfficeName
 
     .PARAMETER Server
     Your organizations API instance of Varbi. e.g: https://api.varbi.com/v1
@@ -29,7 +28,7 @@
     What property value in AD you want to refer to as the Varbi Workphone
 
     .EXAMPLE
-    # In this example we'll use UserPrincipalName as the SSO_UID/Username and exclude Workphone, CellWorkphone, Title and Organization.
+    # In this example we'll use UserPrincipalName as the SSO_UID/Username and exclude Workphone, Workphone, Title and Organization.
     # In this example we assume that GivenName, Surname and Email all points to the default values.
     Initialize-SettingsFile -Server "https://api.varbi.com/v1" -SSO_UID UserPrincipalName
 
@@ -67,24 +66,24 @@
         $Server,
 
         # ADProperty holding information about users's SSO_UID/Username
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [string]
-        $SSO_UID = "SSO_UID",
+        $SSO_UID,
 
         # ADproperty containing the given name of the user
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [string]
-        $GivenName = "GivenName",
+        $GivenName,
 
         # ADproperty containing the surname of the user
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [string]
-        $Surname = "Surname",
+        $Surname,
 
         # ADProperty holding information about user's email address
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [string]
-        $Email = "Mail",
+        $Email,
 
         # ADProperty holding information on Workphone number
         [Parameter()]

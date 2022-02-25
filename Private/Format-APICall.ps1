@@ -109,7 +109,7 @@ function Format-APICall {
             }
             CreateUser {
                 @{
-                    RequestString = "$Server/user"
+                    RequestString = "$Server/accounts"
                     Method        = "POST"
                     Body          = $InputObject
                 }
@@ -118,21 +118,21 @@ function Format-APICall {
                 switch ($PSCmdlet.ParameterSetName) {
                     Name {
                         @{
-                            RequestString = "$Server/user/$SSO_UID"
+                            RequestString = "$Server/accounts/$SSO_UID"
                             Method        = "PATCH"
                             Body          = $InputObject
                         }
                     }
                     Id   {
                         @{
-                            RequestString = "$Server/user/$Id"
+                            RequestString = "$Server/accounts/$Id"
                             Method        = "PATCH"
                             Body          = $InputObject
                         }
                     }
                     Hashtable {
                         @{
-                            RequestString = "$Server/user/$($InputObject.UserName)"
+                            RequestString = "$Server/accounts/$($InputObject.UserName)"
                             Method        = "PATCH"
                             Body          = $InputObject
                         }
@@ -142,13 +142,13 @@ function Format-APICall {
             RemoveUser {
                 if ($Id) {
                     @{
-                        RequestString = "$Server/user/$Id"
+                        RequestString = "$Server/accounts/$Id"
                         Method        = "DELETE"
                     }
                 }
                 elseif ($SSO_UID) {
                     @{
-                        RequestString = "$Server/user/$SSO_UID"
+                        RequestString = "$Server/accounts/$SSO_UID"
                         Method        = "DELETE"
                     }
                 }

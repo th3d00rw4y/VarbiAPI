@@ -56,8 +56,8 @@ function Invoke-VarbiAPI {
             $Response = Invoke-RestMethod @InvokeParams -ErrorAction Stop
         }
         catch {
-            # $_.Exception.Message
-            $RequestError = $_.ErrorDetails | ConvertFrom-Json
+            $_.Exception.Message
+            # $Response = $_.ErrorDetails
             # Clear-Host
             # Get-ErrorMessage -ErrorObject $RequestError
         }

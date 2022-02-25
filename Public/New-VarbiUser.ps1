@@ -91,8 +91,7 @@
         # Surname of the user
         [Parameter(
             Mandatory                       = $true,
-            ParameterSetName                = 'ManualSet',
-            ValueFromPipelineByPropertyName = $true
+            ParameterSetName                = 'ManualSet'
         )]
         [string]
         $Surname,
@@ -100,8 +99,7 @@
         # Given name of the user
         [Parameter(
             Mandatory                       = $true,
-            ParameterSetName                = 'ManualSet',
-            ValueFromPipelineByPropertyName = $true
+            ParameterSetName                = 'ManualSet'
         )]
         [string]
         $GivenName,
@@ -109,38 +107,26 @@
         # SamAccountName for the user
         [Parameter(
             Mandatory                       = $true,
-            ParameterSetName                = 'ManualSet',
-            ValueFromPipelineByPropertyName = $true
+            ParameterSetName                = 'ManualSet'
         )]
         [string]
-        $SamAccountName,
+        $SSO_UID,
 
         # The user's mail
         [Parameter(
             Mandatory                       = $true,
-            ParameterSetName                = 'ManualSet',
-            ValueFromPipelineByPropertyName = $true
+            ParameterSetName                = 'ManualSet'
         )]
         [string]
         $Email,
 
-        # Title of the user
+        # The user's workphone number
         [Parameter(
             Mandatory                       = $false,
-            ParameterSetName                = 'ManualSet',
-            ValueFromPipelineByPropertyName = $true
+            ParameterSetName                = 'ManualSet'
         )]
         [string]
-        $Title,
-
-        # Cellphone of the user
-        [Parameter(
-            Mandatory                       = $false,
-            ParameterSetName                = 'ManualSet',
-            ValueFromPipelineByPropertyName = $true
-        )]
-        [string]
-        $Cellphone,
+        $Workphone,
 
         # Object containing all properties required for user creation.
         [Parameter(
@@ -151,7 +137,7 @@
         [Microsoft.ActiveDirectory.Management.ADAccount]
         $ADObject,
 
-        # Create user based only on AD samaccountname property
+        # Create user based only on AD samaccountname property in conjunction with AD properties provided in the settings file.
         [Parameter(
             Mandatory = $false,
             ParameterSetName = 'OnlySamAccountName'
@@ -204,6 +190,7 @@
 
     end {
         return $Response
+        # return $InvokeParams
     }
 }
 # End function.
