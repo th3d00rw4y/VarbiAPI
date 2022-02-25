@@ -23,6 +23,11 @@ function Format-UsedParameter {
     begin {
         # $UsedParameters = New-Object -TypeName PSCustomObject
         $UsedParameters = [PSCustomObject][ordered]@{}
+        
+        $MetaData = @(
+            @{"key"="date_changed"; "value"=$(Get-Date -Format s)}
+            @{"key"="creation_type"; "value"="VarbiAPI"}
+        )
     }
 
     process {
@@ -61,6 +66,7 @@ function Format-UsedParameter {
 
         $Body = @{}
         $UsedParameters.psobject.Properties | ForEach-Object {$Body[$_.Name] = $_.Value}
+        $Body | Add-Member -MemberType NoteProperty -Name "metadata" -Value $MetaData
     }
 
     end {
