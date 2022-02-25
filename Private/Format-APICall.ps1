@@ -81,7 +81,7 @@ function Format-APICall {
                 switch ($All) {
                     True {
                         @{
-                            RequestString = "$Server/accounts"
+                            RequestString = "$Server/accounts?include_inactive=true"
                             Method        = "GET"
                         }
                     }
@@ -94,13 +94,13 @@ function Format-APICall {
                         }
                         elseif ($SSO_UID) {
                             @{
-                                RequestString = "$Server/accounts?filter[sso_uid]=$SSO_UID"
+                                RequestString = "$Server/accounts?include_inactive=true&filter[sso_uid]=$SSO_UID"
                                 Method        = "GET"
                             }
                         }
                         elseif ($Email) {
                             @{
-                                RequestString = "$Server/accounts?filter[email]=$Email"
+                                RequestString = "$Server/accounts?include_inactive=true&filter[email]=$Email"
                                 Method        = "GET"
                             }
                         }
