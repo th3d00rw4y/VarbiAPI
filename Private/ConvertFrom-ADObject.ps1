@@ -33,7 +33,6 @@ function ConvertFrom-ADObject {
                 @{"key"="creation_type"; "value"="VarbiAPI"}
             )
         }
-        # $UsedParameters = New-Object -TypeName PSCustomObject -Property ([ordered]@{})
     }
 
     process {
@@ -46,16 +45,6 @@ function ConvertFrom-ADObject {
                 {$_.Name -eq "Email"}     {[string]$UsedParameters.email = $ADObject | Select-Object -ExpandProperty $item.Value}
                 {$_.Name -eq "Workphone"} {[string]$UsedParameters.workphone = $ADObject | Select-Object -ExpandProperty $item.Value}
             }
-            <# switch ($item) {
-                {$_.Name -eq "SamAccountName"} {$UsedParameters | Add-Member -MemberType NoteProperty -Name "Username" -Value ($ADObject | Select-Object -ExpandProperty $item.Value)}
-                {$_.Name -eq "GivenName"}      {$GivenName = $ADObject | Select-Object -ExpandProperty $item.Value}
-                {$_.Name -eq "Surname"}        {$UsedParameters | Add-Member -MemberType NoteProperty -Name "Name" -Value "$GivenName $($ADObject | Select-Object -ExpandProperty $item.Value)"}
-                {$_.Name -eq "Email"}          {$UsedParameters | Add-Member -MemberType NoteProperty -Name $item.Name -Value ($ADObject | Select-Object -ExpandProperty $item.Value)}
-                {$_.Name -eq "Title"}          {$UsedParameters | Add-Member -MemberType NoteProperty -Name $item.Name -Value ($ADObject | Select-Object -ExpandProperty $item.Value)}
-                {$_.Name -eq "Organization"}   {$UsedParameters | Add-Member -MemberType NoteProperty -Name $item.Name -Value ($ADObject | Select-Object -ExpandProperty $item.Value)}
-                {$_.Name -eq "Phone"}          {$UsedParameters | Add-Member -MemberType NoteProperty -Name $item.Name -Value ($ADObject | Select-Object -ExpandProperty $item.Value)}
-                {$_.Name -eq "CellPhone"}      {$UsedParameters | Add-Member -MemberType NoteProperty -Name $item.Name -Value ($ADObject | Select-Object -ExpandProperty $item.Value)}
-            } #>
         }
 
         switch ($ReturnType) {
