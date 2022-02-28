@@ -69,6 +69,15 @@
         [string]
         $Id,
 
+        # Email of the user that will be disabled
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Email',
+            ValueFromPipelineByPropertyName = $true
+        )]
+        [string]
+        $Email,
+
         # SamAccountName of the user to be enabled
         [Parameter(
             Mandatory                       = $true,
@@ -89,6 +98,10 @@
         switch ($PSCmdlet.ParameterSetName) {
             Id {
                 $RequestParams = Format-APICall -Property EnableUser -Id $Id -InputObject $Body
+            }
+            Email {
+                $Id = Get-VarbiUser -Email $Email | Select-Object -ExpandProperty id
+                $RequestParams = Format-APICall -Property DisableUser -Id $Id -InputObject $Body
             }
             SamAccountName {
                 $Id = Get-VarbiUser -SSO_UID $SSO_UID | Select-Object -ExpandProperty id

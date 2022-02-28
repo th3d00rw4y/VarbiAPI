@@ -45,7 +45,9 @@ function Format-UsedParameter {
                 foreach ($item in $TMPHash) {
                     switch ($item.Keys) {
                         Surname        {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'lastname' -Value $item.Surname}
+                        Lastname       {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'lastname' -Value $item.lastname}
                         GivenName      {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'firstname' -Value $item.GivenName}
+                        Firstname      {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'firstname' -Value $item.firstname}
                         SSO_UID        {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'sso_uid' -Value $item.SSO_UID}
                         EMail          {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'email' -Value $item.Email}
                         Workphone      {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'workphone' -Value $item.Workphone}
@@ -56,7 +58,9 @@ function Format-UsedParameter {
 
                 switch ($InputObject.PropertyNames) {
                     Surname        {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'lastname' -Value $item.Surname}
+                    Lastname       {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'lastname' -Value $item.lastname}
                     GivenName      {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'firstname' -Value $item.GivenName}
+                    Firstname      {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'firstname' -Value $item.firstname}
                     SSO_UID        {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'sso_uid' -Value $item.SSO_UID}
                     EMail          {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'email' -Value $item.Email}
                     Workphone      {$UsedParameters | Add-Member -MemberType NoteProperty -Name 'workphone' -Value $item.Workphone}

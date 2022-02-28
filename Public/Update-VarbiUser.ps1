@@ -94,7 +94,7 @@
             ParameterSetName = 'ManualSet'
         )]
         [string]
-        $GivenName,
+        $Firstname,
 
         # Surname of the user
         [Parameter(
@@ -102,21 +102,14 @@
             ParameterSetName = 'ManualSet'
         )]
         [string]
-        $Surname,
+        $Lastname,
 
         # SamAccountName for the user
         [Parameter(
             Mandatory        = $false,
             ParameterSetName = 'ManualSet'
         )]
-        [ValidateScript({
-            try {
-                Get-ADUser $_ -ErrorAction Stop
-            }
-            catch {
-                Write-Error $_.Exception.Message
-            }
-        })]
+        [ValidateScript({Get-ADUser -Filter "UserPrincipalName -eq '$_'"})]
         [string]
         $SSO_UID,
 
@@ -177,9 +170,11 @@
         switch ($PSCmdlet.ParameterSetName) {
 
             ManualSet {
+                Write-Host "Rövhäsm!!" -ForegroundColor Yellow
                 $UsedParameters = Format-UsedParameter -SetName ManualSet -InputObject $Parameters
             }
             ObjectSet {
+                Write-Host "Bajsmacka!" -ForegroundColor Yellow
                 $UsedParameters = ConvertFrom-ADObject -ADObject $ADObject
                 # $UsedParameters = Format-UsedParameter -SetName ObjectSet -InputObject $InputObject
             }

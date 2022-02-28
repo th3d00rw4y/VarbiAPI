@@ -45,6 +45,13 @@ Please make sure you've followed each one.
 
 ## Changelog
 `VarbiAPI` is currently only maintained by me. I will try to add as many features as possible.
+- ## 2022.02.28 - Version: 0.0.1.3
+    - New public cmdlets:
+        - [x] [Sync-VarbiFromADGroup](Docs/Sync-VarbiFromADGroup.md)
+    - New private functions:
+        - `Compare-Object`
+            - A proxy function for the built-in Compare-Object cmdlet, created by [DBremen](https://github.com/DBremen)
+    - Various fixes in cmdlets and functions.
 - ## 2022.02.22 - Version: 0.0.1.2
     - New public cmdlets:
         - [x] [Update-VarbiUser](Docs/Update-VarbiUser.md)
