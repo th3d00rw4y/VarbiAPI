@@ -24,17 +24,17 @@
         # Name of AD group to be synced with
         [Parameter(Mandatory = $true)]
         [string]
-        $ADGroup = "ACCESS-ADM-Varbi",
+        $ADGroup,
 
         # Path to file holding accounts you want to exclude from the synchronization. Exclusion is based on Username in Varbi.
         [Parameter()]
         [string]
-        $PathToExcludedAccountsFile = "C:\TMP\Secrets\VarbiExcludedAccounts.txt",
+        $PathToExcludedAccountsFile,
 
         # Log file path
         [Parameter()]
         [string]
-        $LogFilePath = "C:\TMP\VarbiLog.log"
+        $LogFilePath
     )
 
     begin {
