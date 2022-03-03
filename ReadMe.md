@@ -103,7 +103,7 @@ Please make sure you've followed each one.
 <!-- ROADMAP -->
 ## Roadmap
 
- - [x] Adding compability for working with datasource
+ - [x] Adding compability for working more schemas, such as Permissions, Organizations and Privileges
  - [x] Improve error message handling
 
 <!-- ACKNOWLEDGEMENTS -->
