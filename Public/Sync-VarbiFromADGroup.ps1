@@ -24,15 +24,23 @@
         # Name of AD group to be synced with
         [Parameter(Mandatory = $true)]
         [string]
-        $ADGroup,
+        $ADGroup = "ACCESS-ADM-Varbi",
 
         # Path to file holding accounts you want to exclude from the synchronization. Exclusion is based on Username in Varbi.
         [Parameter()]
         [string]
-        $PathToExcludedAccountsFile = "C:\TMP\Secrets\VarbiExcludedAccounts.txt"
+        $PathToExcludedAccountsFile = "C:\TMP\Secrets\VarbiExcludedAccounts.txt",
+
+        # Log file path
+        [Parameter()]
+        [string]
+        $LogFilePath = "C:\TMP\VarbiLog.log"
     )
 
     begin {
+
+        $Component = $MyInvocation.MyCommand
+        Write-StartEndLog -Action Start -LogFilePath $LogFilePath
 
         # Checking that provided ADGroup actually exists.
         $ADGroupExists = try {
@@ -57,7 +65,7 @@
             True  {
 
                 # Retreiving all users that are member of provided group.
-                $ADGroupMembers = Get-ADGroupMember -Identity $ADGroup
+                $ADGroupMembers = Get-ADGroupMember -Identity $ADGroup -Recursive
 
                 # Formatting each AD user to match with object structure in Varbi.
                 $ADUsersFormatted = foreach ($GroupMember in $ADGroupMembers) {
@@ -65,85 +73,50 @@
                 }
 
                 # Comparing AD group members with current Varbi users to see if there are any changes to be made.
-                $UsersToUpdate = foreach ($item in $ADUsersFormatted) {
+                $UsersToUpdate = Get-SyncData -CurrentVarbiUsers $CurrentVarbiUsers -InputObject $ADUsersFormatted -ExcludedAccounts $ExcludedAccounts
 
-                    $TMP = $CurrentVarbiUsers | Where-Object {$_.email -eq $item.email}
-
-                    # Compare user
-                    try {
-                        $Compare = Compare-Object -ReferenceObject $item -DifferenceObject $TMP -Compact -ErrorAction SilentlyContinue
-                    }
-                    catch {
-                        Write-Error $_.Exception.Message
-                    }
-
-                    if ($Compare) {
-
-                        $TempHash = [PSCustomObject][ordered]@{}
-
-                        # Identifying what properties that differ
-                        foreach ($Found in $Compare) {
-                            switch ($Found.Property) {
-                                email        {$TempHash | Add-Member -MemberType NoteProperty -Name 'email' -Value $Found.ReferenceValue}
-                                firstname    {$TempHash | Add-Member -MemberType NoteProperty -Name 'firstname' -Value $Found.ReferenceValue}
-                                lastname     {$TempHash | Add-Member -MemberType NoteProperty -Name 'lastname' -Value $Found.ReferenceValue}
-                                workphone    {$TempHash | Add-Member -MemberType NoteProperty -Name 'workphone' -Value $Found.ReferenceValue}
-                                sso_uid      {$TempHash | Add-Member -MemberType NoteProperty -Name 'sso_uid' -Value $Found.ReferenceValue}
-                            }
-                        }
-
-                        if ($TempHash | get-member | Where-Object {$_.MemberType -contains 'NoteProperty'}) {
-
-                            foreach ($Property in ($TempHash | get-member | Where-Object {$_.MemberType -contains 'NoteProperty'})) {
-                                if (-not ($TempHash.$($Property.Name).Length -gt 0)) {
-                                    $TempHash.$($Property.Name) = ""
+                switch ($UsersToUpdate) {
+                    
+                    {$_.StatusChanges} {
+                        foreach ($Change in $_.StatusChanges) {
+                            switch ($Change.action) {
+                                Update {
+                                    switch ($Change.status) {
+                                        True  {
+                                            Enable-VarbiUser -Email $Change.email
+                                            # $ReturnHash.Enabled = $Change.email
+                                            Write-CMTLog -Message "User with email: $($Change.email) has been enabled" -LogLevel Normal -Component $Component -LogFilePath $LogFilePath
+                                        }
+                                        False {
+                                            Disable-VarbiUser -Email $Change.email
+                                            Clear-VarbiUser -Email $Change.email
+                                            # $ReturnHash.Disabled = $Change.email
+                                            Write-CMTLog -Message "User with email: $($Change.email) has been disabled and user properties cleared." -LogLevel Normal -Component $Component -LogFilePath $LogFilePath
+                                        }
+                                    }
+                                }
+                                New {
+                                    $NewVarbiUser = Get-ADUser -Filter "mail -eq '$($Change.email)'" -Properties $ADProperties | New-VarbiUser
+                                    Write-CMTLog -Message "User created: id = $($NewVarbiUser.id) - sso_uid = $($NewVarbiUser.sso_uid)" -LogLevel Normal -Component $Component -LogFilePath $LogFilePath
+                                    Clear-Variable NewVarbiUser
                                 }
                             }
-
-                            $TempHash | Add-Member -MemberType NoteProperty -Name 'id' -Value $TMP.id
-
-                            $UpdateParams = @{}
-                            $TempHash.psobject.Properties | ForEach-Object {$UpdateParams[$_.Name] = $_.Value}
-
-                            $UpdateParams
-                            # ! Logga här!!
-                            Update-VarbiUser @UpdateParams
-
-                            Clear-Variable UpdateParams
                         }
-
-                        Clear-Variable Compare, TempHash, TMP
                     }
-                }
+                    {$_.Updates} {
 
-                # Comparing AD users with Varbi users to see if any accounts are to be enabled/disabled
-                try {
-                    $UserCompare = Compare-Object -ReferenceObject $CurrentVarbiUsers.email -DifferenceObject $ADUsersFormatted.email -IncludeEqual -ErrorAction SilentlyContinue | Where-Object {$_.InputObject -notin $ExcludedAccounts}
-                }
-                catch {
-                    Write-Error $_.Exception.Message
-                }
+                        foreach ($item in $_.Updates) {
 
-                if ($UserCompare) {
+                            if ((Get-VarbiUser -Id $item.id).status -eq $true) {
+                                
+                                $UpdateParams = @{}
+                                $item.psobject.Properties | ForEach-Object {$UpdateParams[$_.Name] = $_.Value}
+                                Write-Host "Hoppp!" -ForegroundColor Red
+                                Update-VarbiUser @UpdateParams
+                                # $ReturnHash.Updates = $item.id
 
-                    $UserChanges = foreach ($ComparedUser in $UserCompare) {
-                        switch ($ComparedUser) {
-                            # If '=>' a new user will be created
-                            {$_.SideIndicator -eq '=>'} {Get-ADUser -Identity $ComparedUser.InputObject -Properties $ADProperties}# | New-VarbiUser}
-
-                            # If '<=', user has been removed from AD group and will therefore be disabled in Varbi.
-                            {$_.SideIndicator -eq '<='} {
-                                if (($CurrentVarbiUsers | Where-Object {$_.email -eq $ComparedUser.InputObject}).status -eq $true) {
-                                    Disable-VarbiUser -Email $ComparedUser.InputObject
-                                    Write-Host "Disable: $($ComparedUser.InputObject)" -ForegroundColor Red
-                                }
-                            }
-
-                            # If '==' and user is set to Disabled within Varbi, the user will be reenabled.
-                            {$_.SideIndicator -eq '=='} {
-                                if (($CurrentVarbiUsers | Where-Object {$_.email -eq $ComparedUser.InputObject}).status -eq $false) {
-                                    Enable-VarbiUser -Email $ComparedUser.InputObject
-                                    Write-Host "Enable!" -ForegroundColor Green
+                                foreach ($Property in $item.psobject.Properties | Where-Object {$_.Name -ne 'id'}) {
+                                    Write-CMTLog -Message "User id: $($item.id) has been updated with $($Property.Name) = $($Property.Value)" -LogLevel Normal -Component $Component -LogFilePath $LogFilePath
                                 }
                             }
                         }
@@ -152,14 +125,10 @@
             }
             False {}
         }
-
-        $ReturnHash = @()
-        $ReturnHash += $UsersToUpdate
-        $ReturnHash += $UserChanges
     }
 
     end {
-        return $ReturnHash
+        Write-StartEndLog -Action Stop -LogFilePath $LogFilePath
     }
 }
 # End function.

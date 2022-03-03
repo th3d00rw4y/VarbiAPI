@@ -11,7 +11,7 @@ function Format-APICall {
             'UpdateUser',
             'EnableUser',
             'DisableUser',
-            'RemoveUser'
+            'ClearUser'
         )]
         [string]
         $Property,
@@ -114,7 +114,7 @@ function Format-APICall {
                     Body          = $InputObject
                 }
             }
-            {($_ -eq "UpdateUser") -or ($_ -eq "EnableUser") -or ($_ -eq "DisableUser")} {
+            {($_ -eq "UpdateUser") -or ($_ -eq "EnableUser") -or ($_ -eq "DisableUser") -or ($_ -eq "ClearUser")} {
                 switch ($PSCmdlet.ParameterSetName) {
                     Name {
                         @{
@@ -136,20 +136,6 @@ function Format-APICall {
                             Method        = "PATCH"
                             Body          = $InputObject
                         }
-                    }
-                }
-            }
-            RemoveUser {
-                if ($Id) {
-                    @{
-                        RequestString = "$Server/accounts/$Id"
-                        Method        = "DELETE"
-                    }
-                }
-                elseif ($SSO_UID) {
-                    @{
-                        RequestString = "$Server/accounts/$SSO_UID"
-                        Method        = "DELETE"
                     }
                 }
             }

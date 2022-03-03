@@ -45,6 +45,17 @@ Please make sure you've followed each one.
 
 ## Changelog
 `VarbiAPI` is currently only maintained by me. I will try to add as many features as possible.
+- ## 2022.03.03 - Version: 0.0.1.4
+    - New public cmdlets:
+        - [x] [Clear-VarbiUser](Docs/Clear-VarbiUser.md)
+    - New private functions:
+        - `Get-SyncData`
+            - Handles data sent from `Sync-VarbiFromADGroup` and returns a structured object with information on what needs to be done regarding the synchronization.
+        - `Write-CMTLog`
+            - Writes logs from `Sync-VarbiFromADGroup` in a format that [CMTrace](https://www.microsoft.com/en-us/download/details.aspx?id=50012) reads really well.
+        - `Write-StartEndLog`
+            - Writes starting and ending point in the log file
+    - Various edits to `Sync-VarbiFromADGroup`, `Update-VarbiUser` and `Format-APICall`
 - ## 2022.02.28 - Version: 0.0.1.3
     - New public cmdlets:
         - [x] [Sync-VarbiFromADGroup](Docs/Sync-VarbiFromADGroup.md)

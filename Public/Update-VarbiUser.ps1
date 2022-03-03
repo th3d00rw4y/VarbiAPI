@@ -170,18 +170,14 @@
         switch ($PSCmdlet.ParameterSetName) {
 
             ManualSet {
-                Write-Host "Rövhäsm!!" -ForegroundColor Yellow
                 $UsedParameters = Format-UsedParameter -SetName ManualSet -InputObject $Parameters
             }
             ObjectSet {
-                Write-Host "Bajsmacka!" -ForegroundColor Yellow
                 $UsedParameters = ConvertFrom-ADObject -ADObject $ADObject
-                # $UsedParameters = Format-UsedParameter -SetName ObjectSet -InputObject $InputObject
             }
             OnlySamAccountName {
                 $ADObject = Get-ADUser -Identity $OnlySamAccountName -Properties $ADProperties
                 $UsedParameters = ConvertFrom-ADObject -ADObject $ADObject
-                # $UsedParameters = Format-UsedParameter -SetName OnlySamAccountName -InputObject $ADObject
             }
         }
 
